@@ -1,0 +1,13 @@
+variables:
+  LANG: "en_US.UTF-8"
+  LANGUAGE: "en_US.UTF-8"
+  LC_ALL: "en_US.UTF-8"
+before_script:
+  - env
+  - chmod +x gradlew
+publish:
+  script:
+    - android/sdk/gradlew -x test :sdk:build
+    - ./gradlew -x test :sdk:publishMavenPublicationToMavenRepository
+  only:
+    - tags

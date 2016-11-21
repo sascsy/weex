@@ -1,5 +1,7 @@
 buildscript {
     repositories {
+        maven { url 'http://nexus.jiucai.org/content/repositories/bintray-jcenter/' }
+        maven { url 'http://nexus.jiucai.org/content/repositories/central/' }
         mavenCentral()
         jcenter()
     }
@@ -15,6 +17,9 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url 'http://nexus.jiucai.org/content/repositories/bintray-jcenter/' }
+        maven { url 'http://nexus.jiucai.org/content/repositories/central/' }
+        maven { url 'http://nexus.jiucai.org/content/repositories/releases/' }
         mavenCentral()
         jcenter()
     }
@@ -23,6 +28,7 @@ allprojects {
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.hierynomus.license'
 apply plugin: 'checkstyle'
+apply plugin: 'maven-publish'
 
 ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
 
@@ -42,7 +48,7 @@ task checkstyle(type: Checkstyle) {
     exclude '**/test/**'
     exclude '**/com/taobao/weex/dom/flex/**'
     classpath = files()
-    
+
 }
 
 checkstyle {
@@ -176,4 +182,28 @@ preBuild.dependsOn licenseFormat
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.10'
+}
+
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "source"
+}
+
+publishing {
+    publications {
+        repositories.maven {
+            url 'http://nexus.jiucai.org/content/repositories/snapshots'
+            credentials {
+                username "chengsiyuan"
+                password "RlH1@YGk"
+            }
+        }
+        maven(MavenPublication) {
+            groupId 'com.socialtouch.wemedia'
+            artifactId 'weex-snapshot'
+            version 0.1
+            artifact(sourceJar)
+            artifact("build/outputs/aar/lib-release.aar")
+        }
+    }
 }
